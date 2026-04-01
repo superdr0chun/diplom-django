@@ -1,0 +1,32 @@
+# --- Python / Django ---
+venv/
+env/
+__pycache__/
+*.py[cod]
+db.sqlite3
+.env
+*.log
+media/
+staticfiles/
+
+# --- C# / WPF / Visual Studio ---
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.dll
+*.exe
+packages/
+
+# --- IDE ---
+.idea/
+*.swp
+*.swo
+.DS_Store
