@@ -64,22 +64,5 @@ python manage.py runserver
 
 По структуре
 ===
-diplom-backend/
-├── manage.py              
-├── db.sqlite3             
-├── venv/                  
-├── api/                   
-│   ├── __init__.py
-│   ├── apps.py            
-│   ├── models.py          
-│   ├── views.py           
-│   ├── serializers.py     
-│   ├── urls.py            
-│   └── tests.py          
-├── myproject/             
-│   ├── __init__.py
-│   ├── settings.py        
-│   ├── urls.py            
-│   └── wsgi.py           
-├── .gitignore             
-└── README.md              
+<img width="305" height="507" alt="Снимок экрана 2026-04-02 140127" src="https://github.com/user-attachments/assets/4fa55274-c5cb-4e3d-856f-c36042520574" />
+   
