@@ -1,0 +1,52 @@
+{% extends 'api/base.html' %}
+{% block title %}Создать тест{% endblock %}
+
+{% block content %}
+<h2>Создать тест</h2>
+
+<div class="card">
+    <form method="POST">
+        {% csrf_token %}
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <div class="form-group">
+                <label>Название *</label>
+                <input type="text" name="title" required>
+            </div>
+            <div class="form-group">
+                <label>Дисциплина</label>
+                <input type="text" name="subject">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea name="description" rows="3"></textarea>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px;">
+    <div class="form-group">
+        <label>Время (мин, 0 = без ограничения)</label>
+        <input type="number" name="time_limit" value="0" min="0">
+    </div>
+    <div class="form-group">
+        <label>Количество попыток</label>
+        <input type="number" name="attempts_allowed" value="1" min="1">
+    </div>
+    <div class="form-group">
+        <label>Вопросов из банка (0 = все)</label>
+        <input type="number" name="questions_per_attempt" value="0" min="0">
+    </div>
+</div>
+        <div style="display: flex; gap: 20px; margin-bottom: 16px;">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" name="shuffle_questions"> Случайный порядок вопросов
+            </label>
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                <input type="checkbox" name="shuffle_answers"> Случайный порядок ответов
+            </label>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button type="submit" class="btn btn-success">Создать и добавить вопросы</button>
+            <a href="/web/tests/" class="btn btn-warning">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

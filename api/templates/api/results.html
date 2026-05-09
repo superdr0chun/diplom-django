@@ -1,0 +1,121 @@
+{% extends 'api/base.html' %}
+{% block title %}Результаты{% endblock %}
+
+{% block content %}
+<h2>Результаты тестирования</h2>
+
+<div class="card">
+    <form method="GET" style="display:flex; gap:16px; align-items:flex-end;">
+        <div class="form-group" style="margin:0; flex:1;">
+            <label>Фильтр по тесту</label>
+            <select name="test_id">
+                <option value="">Все тесты</option>
+                {% for test in tests %}
+                    <option value="{{ test.id }}" {% if selected_test == test.id|stringformat:"s" %}selected{% endif %}>
+                        {{ test.title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin:0; flex:1;">
+            <label>Поиск по студенту</label>
+            <input type="text" name="username" value="{{ selected_username }}" placeholder="Имя пользователя">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin-bottom:0;">Фильтровать</button>
+        <a href="/web/results/" class="btn btn-warning">Сбросить</a>
+        <a href="/web/results/export/?test_id={{ selected_test }}&username={{ selected_username }}"
+   class="btn btn-success" style="margin-bottom:0;">📥 Экспорт в Excel</a>
+    </form>
+</div>
+
+{% if results %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Тест</th>
+                <th>Балл</th>
+                <th>Макс. балл</th>
+                <th>Процент</th>
+                <th>Оценка</th>
+                <th>Дата</th>
+                <th>Переключения</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.user.username }}</td>
+                <td>{{ result.test.title }}</td>
+                <td>{{ result.score }}</td>
+                <td>{{ result.max_score }}</td>
+                <td>
+                    {% if result.max_score > 0 %}
+                        {{ result.score|floatformat:0 }}/{{ result.max_score|floatformat:0 }}
+                        ({% widthratio result.score result.max_score 100 %}%)
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+                <td>
+                    {% with grade=result.grade %}
+                        {% if grade == 5 %}
+                            <span class="badge badge-green">5</span>
+                        {% elif grade == 4 %}
+                            <span class="badge" style="background:#d6eaf8; color:#1a5276;">4</span>
+                        {% elif grade == 3 %}
+                            <span class="badge" style="background:#fef9e7; color:#7d6608;">3</span>
+                        {% else %}
+                            <span class="badge" style="background:#fadbd8; color:#922b21;">2</span>
+                        {% endif %}
+                    {% endwith %}
+                </td>
+                <td>{{ result.finished_at|date:"d.m.Y H:i" }}</td>
+                <td>
+    {% if result.tab_switches > 0 %}
+        <span style="color:#DC2626; font-weight:600;">{{ result.tab_switches }}</span>
+    {% else %}
+        <span style="color:#6B7280;">0</span>
+    {% endif %}
+</td>
+<td>
+    <a href="/web/results/review/{{ result.id }}/" class="btn btn-primary"
+       style="padding:5px 10px; font-size:12px;">Проверить</a>
+</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Статистика -->
+<div class="card">
+    <h3 style="margin-bottom:16px;">Статистика</h3>
+    <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; text-align:center;">
+        <div>
+            <div style="font-size:28px; font-weight:bold;">{{ results|length }}</div>
+            <div style="color:#666;">Всего попыток</div>
+        </div>
+        <div>
+            <div style="font-size:28px; font-weight:bold; color:#27ae60;">{{ avg_percent }}%</div>
+            <div style="color:#666;">Средний процент</div>
+        </div>
+        <div>
+            <div style="font-size:28px; font-weight:bold; color:#27ae60;">{{ grade5_count }}</div>
+            <div style="color:#666;">Оценок "5"</div>
+        </div>
+        <div>
+            <div style="font-size:28px; font-weight:bold; color:#e74c3c;">{{ grade2_count }}</div>
+            <div style="color:#666;">Оценок "2"</div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<div class="card">
+    <p style="color:#666; text-align:center; padding:30px 0;">Результатов пока нет.</p>
+</div>
+{% endif %}
+{% endblock %}

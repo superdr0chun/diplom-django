@@ -1,0 +1,88 @@
+{% extends 'api/base.html' %}
+{% block title %}Проверка результата{% endblock %}
+
+{% block content %}
+<h2>Проверка работы: {{ result.user.username }}</h2>
+<p style="color:#666; margin-bottom:20px;">
+    Тест: <strong>{{ result.test.title }}</strong> •
+    Баллы: <strong>{{ result.score }}/{{ result.max_score }}</strong> •
+    Оценка: <strong>{{ result.grade }}</strong>
+</p>
+
+{% if request.GET.saved %}
+    <div class="alert alert-success">Изменения сохранены</div>
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+
+    {% for ua in user_answers %}
+    {% if ua.is_correct == True %}
+<div class="card" style="border-left: 4px solid #27ae60;">
+{% elif ua.is_correct == False %}
+<div class="card" style="border-left: 4px solid #e74c3c;">
+{% else %}
+<div class="card" style="border-left: 4px solid #f39c12;">
+{% endif %}
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong>{{ forloop.counter }}. {{ ua.question.text }}</strong>
+            <span class="badge badge-gray">{{ ua.question.points }} балл(ов)</span>
+        </div>
+
+        {% if ua.question.question_type == 'text' %}
+            <!-- ОТКРЫТЫЙ ВОПРОС -->
+            <div style="background:#f8f9fa; padding:12px; border-radius:5px; margin-bottom:12px;">
+                <strong style="color:#666; font-size:13px;">Ответ студента:</strong>
+                <div style="margin-top:6px;">{{ ua.text_answer|default:"(пусто)"|linebreaks }}</div>
+            </div>
+            <div>
+                <label style="font-weight:600; margin-right:16px;">Оценка:</label>
+                <label style="margin-right:14px; cursor:pointer;">
+                    <input type="radio" name="grade_{{ ua.id }}" value="correct"
+                           {% if ua.is_correct == True %}checked{% endif %}>
+                    ✓ Зачесть
+                </label>
+                <label style="margin-right:14px; cursor:pointer;">
+                    <input type="radio" name="grade_{{ ua.id }}" value="incorrect"
+                           {% if ua.is_correct == False %}checked{% endif %}>
+                    ✗ Не зачитывать
+                </label>
+                {% if ua.is_correct is None %}
+                    <span class="badge" style="background:#fef9e7; color:#7d6608;">Не проверено</span>
+                {% endif %}
+            </div>
+        {% else %}
+            <!-- ЗАКРЫТЫЙ ВОПРОС -->
+            <div style="margin-top:8px;">
+                {% for ans in ua.question.answers.all %}
+                <div style="padding:6px 0;">
+                    {% if ans.id in ua.selected_answers.all|stringformat:"s" %}{% endif %}
+                    {% with selected=ua.selected_answers.all %}
+                        {% if ans in selected %}
+                            <strong style="color:#3498db;">▶ {{ ans.text }}</strong>
+                            {% if ans.is_correct %}
+                                <span style="color:#27ae60;"> ✓ верно</span>
+                            {% else %}
+                                <span style="color:#e74c3c;"> ✗ ошибка</span>
+                            {% endif %}
+                        {% else %}
+                            <span style="color:#999;">{{ ans.text }}</span>
+                            {% if ans.is_correct %}
+                                <span style="color:#27ae60; font-size:12px;"> (правильный)</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <div style="display:flex; gap:10px; margin-top:20px;">
+        <button type="submit" class="btn btn-success">Сохранить оценки</button>
+        <a href="/web/results/" class="btn btn-warning">Назад к результатам</a>
+    </div>
+</form>
+{% endblock %}
